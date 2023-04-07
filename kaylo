@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:7.14.1
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - &quotES_JAVA_OPTS=-Xms512m -Xmx512m&quot
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - /opt/elk/elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+
+  kibana:
+    container_name: kibana
+    image: kibana:7.14.1
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '[&quothttp://elasticsearch:9200&quot]'
+    ports:
+      - '5601:5601'
